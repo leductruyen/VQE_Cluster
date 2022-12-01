@@ -280,30 +280,40 @@ def main_function():
 
     # QN-SPSA + SPSA
     def SPSA_QN_SPSA(q,h,qc,parameters, epsilon = 0.01 ,l_rate=0.01, ite = 100, backend = Aer.get_backend('qasm_simulator')):
-        Deriva = [[0] for i in range(qc.num_parameters)]
-        Upd_para = [[0] for i in range(qc.num_parameters)]
+        num_parameters = qc.num_parameters
+        Deriva = [[0] for i in range(num_parameters)]
+        Upd_para = [[0] for i in range(num_parameters)]
         vqe = []
-        g = np.zeros([len(parameters),len(parameters)])
+        # Instantiate the preceding running result
+        g1 = np.zeros([num_parameters,num_parameters])
         for j in range(ite):
-            Dvqe = [0 for i in range(len(parameters))]
+            Dvqe = [0 for i in range(num_parameters)]
             # Perturbation vector
-            per_vec = [np.random.choice([1,-1])*epsilon for i in range(len(parameters))]
+            per_vec = [np.random.choice([1,-1])*epsilon for i in range(num_parameters)]
             spsa_diff = vqe_exact(qc, np.add(parameters,per_vec),q,h,realbackend=backend)-vqe_exact(qc,np.subtract(parameters,per_vec),q,h,realbackend=backend)
-            for i in range(len(parameters)):
+            for i in range(num_parameters):
 
                 Dvqe[i] = 1/(2*per_vec[i])*spsa_diff
             
-            # Get the QN_SPSA
-            g = QN_SPSA(qc,parameters,g,Nth_iter=j,realbackend=backend)
-            # Pseudo-inverse
-            g_1 = linalg.pinv(g) 
+           # Get the QN_SPSA
+            g = QN_SPSA(qc,parameters,g1,Nth_iter=j)
+            state = True
+            while state:
+                try:
+                    # Pseudo-inverse
+                    g_1 = linalg.pinv(g)
+                    state = False
+                except:
+                    g = QN_SPSA(qc,parameters,g1,Nth_iter=i)
+            # save for the next running
+            g1 = g 
             # Update papramter
-            for i in range(len(parameters)):
-                for j in range(len(parameters)):
+            for i in range(num_parameters):
+                for j in range(num_parameters):
                     parameters[i]-=l_rate*g_1[i,j]*Dvqe[j]
                 Upd_para[i].append(parameters[i])
                 Deriva[i].append(Dvqe[i])
-            vqe.append(vqe_exact(qc, parameters,q,h))
+            vqe.append(vqe_exact(qc, parameters,q,h,realbackend=backend))
         return vqe
     
     # Input paramters from parameter file
