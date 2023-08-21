@@ -1,4 +1,3 @@
-from ast import main
 from qiskit.circuit.library import TwoLocal, EfficientSU2, RealAmplitudes, NLocal, PauliTwoDesign
 # from qiskit_nature.circuit.library import UCCSD, PUCCD, SUCCD # chemistry simulation ansatzes, for example the UCCSD ansatz prepares a state where tuning the parameters turns excitations on and off
 from qiskit.circuit import Parameter, ParameterVector, QuantumCircuit, QuantumRegister, ClassicalRegister
@@ -736,7 +735,7 @@ def main_function():
                                 g[i+real_Nrotblock_1q*q*k,j+real_Nrotblock_1q*q*k]= Expectation_Exact('YY',i,j,circ= sqc[k],realbackend=qbackend)-Expectation_Exact('Y',i,circ= sqc[k],realbackend=qbackend)*Expectation_Exact('Y',j,circ = sqc[k],realbackend=qbackend)
                 
                 #SPSA gradient
-                Dvqe[i] = 1/(2*per_vec[i])*spsa_diff
+                Dvqe[m] = 1/(2*per_vec[m])*spsa_diff
             
             # Pseudo-inverse
             g = linalg.pinv(g)
@@ -875,7 +874,7 @@ def main_function():
                                 g[i+real_Nrotblock_1q*q*k,j+real_Nrotblock_1q*q*k]= Expectation_Exact('YY',i,j,circ= sqc[k],realbackend=qbackend)-Expectation_Exact('Y',i,circ= sqc[k],realbackend=qbackend)*Expectation_Exact('Y',j,circ = sqc[k],realbackend=qbackend)
                 
                 #SPSA gradient
-                Dvqe[i] = 1/(2*per_vec[i])*spsa_diff
+                Dvqe[m] = 1/(2*per_vec[m])*spsa_diff
             
             # Pseudo-inverse
             g = linalg.pinv(g)
